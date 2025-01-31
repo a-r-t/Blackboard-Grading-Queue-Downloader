@@ -89,7 +89,7 @@ async function getStudentsInCourse() {
     }
     catch(err) {
         console.error(err)
-        console.error(`Failed to get students in course ${columnId}: ${err.message}`)
+        console.error(`Failed to get students in course ${courseId}: ${err.message}`)
         throw err
     }
 }
