@@ -17,7 +17,7 @@ I can already authenticate to Blackboard from the browser, so I don't get why th
 Run `npm install` to pull down dependencies, and then `node index.js` from the root project folder.
 Need at least node version 20 to run this.
 
-### Environment Variables
+## Environment Variables
 
 Rename `.env.sample` to `.env` and fill out the values for your use case.
 
@@ -29,7 +29,7 @@ Rename `.env.sample` to `.env` and fill out the values for your use case.
 
 **DESTINATION_DIR**: This is the file path where the script will downloading files to the computer.
 
-### Resulting File Structure of Downloaded Content
+## Resulting File Structure of Downloaded Content
 
 Starting from the destination directory (env var), the file paths created will be in this format:
 
