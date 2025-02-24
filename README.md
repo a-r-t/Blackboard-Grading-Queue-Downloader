@@ -14,7 +14,7 @@ I can already authenticate to Blackboard from the browser, so I don't get why th
 
 ## How to run this
 
-Run `npm install` to pull down dependencies, and then `node index.js` from the root project folder.
+Run `npm install` to pull down dependencies, and then `npm run start` from the root project folder.
 Need at least node version 20 to run this.
 
 ## Environment Variables
