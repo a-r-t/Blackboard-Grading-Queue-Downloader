@@ -41,8 +41,7 @@ async function main() {
         // keeps track of the submission count for a student
         // this is used to differentiate between multiple attempts for the same student
         const studentSubmissionNumberTracker = {}
-
-        columnAttempts.forEach(async attempt => {
+        for (const attempt of columnAttempts) {
             // get list of files in a submission
             const assignmentSubmissionFiles = await getAssignmentSubmissionFileList(attempt.id)
             assignmentSubmissionFiles.forEach(async file => {
@@ -64,7 +63,7 @@ async function main() {
                 createDirectoriesInPathIfNotExist(`${rootDestinationDir}/${outputPath}`)
                 await downloadAssignmentSubmissionFile(attempt.id, file.id, `${rootDestinationDir}/${outputPath}/${file.name}`)
             })
-        })
+        }
     })
 }
 
