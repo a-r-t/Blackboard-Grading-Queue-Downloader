@@ -34,7 +34,7 @@ async function main() {
 
     // get all assignments
     const columns = await getColumns()
-    columns.forEach(async column => {
+    for (const column of columns) {
         // get all submissions for an assignment 
         const columnAttempts = await getUngradedColumnAttempts(column.id)
 
@@ -42,29 +42,32 @@ async function main() {
         // this is used to differentiate between multiple attempts for the same student
         const studentSubmissionNumberTracker = {}
         for (const attempt of columnAttempts) {
+            // determine student that owns the attempt
+            const student = studentMap[attempt.userId]
+
             // get list of files in a submission
             const assignmentSubmissionFiles = await getAssignmentSubmissionFileList(attempt.id)
+
+            // add to student attempt number
+            // if student submitted multiple attempts for an assignment, the most recent attempt will be the highest number
+            if (studentSubmissionNumberTracker[student.id]) {
+                studentSubmissionNumberTracker[student.id]++;
+            }
+            else {
+                studentSubmissionNumberTracker[student.id] = 1
+            }
+
+            // determine current attempt number
+            const attemptNumber = studentSubmissionNumberTracker[student.id]
+            
             assignmentSubmissionFiles.forEach(async file => {
                 // download a file from the submission to computer at specified output path
-                const student = studentMap[attempt.userId]
-
-                // determine attempt number
-                // if student submitted multiple attempts for an assignment, the most recent attempt will be the highest number
-                if (studentSubmissionNumberTracker[student.id]) {
-                    studentSubmissionNumberTracker[student.id]++;
-                }
-                else {
-                    studentSubmissionNumberTracker[student.id] = 1
-                }
-                const attemptNumber = studentSubmissionNumberTracker[student.id]
-
-                // download file to output path
                 const outputPath = sanitizePath(`${column.name}/${student.username}_${student.firstName}_${student.lastName}/attempt_${attemptNumber}`)
                 createDirectoriesInPathIfNotExist(`${rootDestinationDir}/${outputPath}`)
                 await downloadAssignmentSubmissionFile(attempt.id, file.id, `${rootDestinationDir}/${outputPath}/${file.name}`)
             })
         }
-    })
+    }
 }
 
 // get data for a user on Blackboard
@@ -104,7 +107,7 @@ async function getColumns() {
     catch(err) {
         console.error(err)
         console.error(`Failed to get column data: ${err.message}`)
-        throw err
+        return []
     }
 }
 
@@ -120,7 +123,7 @@ async function getUngradedColumnAttempts(columnId) {
     catch(err) {
         console.error(err)
         console.error(`Failed to get ungraded column ${columnId} attempts data: ${err.message}`)
-        throw err
+        return []
     }
 }
 
@@ -133,7 +136,7 @@ async function getAssignmentSubmissionFileList(attemptId) {
     catch(err) {
         console.error(err)
         console.error(`Failed to get assignment submission file list data for attempt ${attemptId}: ${err.message}`)
-        throw err
+        return []
     }
 }
 
@@ -171,7 +174,6 @@ async function downloadAssignmentSubmissionFile(attemptId, fileId, destinationPa
     catch(err) {
         console.error(err)
         console.error(`Failed to download file ${fileId} for attempt ${attemptId}: ${err.message}`)
-        throw err
     }
 }
 
@@ -195,7 +197,10 @@ function unzipFile(zipFilePath) {
         const zip = new AdmZip(zipFilePath)
 
         // unzip file to the same location as zip file is in (it will create a new folder with the name of the zip file and extract all contents to it)
-        zip.extractAllTo(path.dirname(zipFilePath))
+        zip.extractAllTo(`${path.dirname(zipFilePath)}/${path.parse(zipFilePath).name}`)
+
+        // deletes zip file (not needed anymore)
+        fs.unlinkSync(zipFilePath)
     }
     catch(err) {
         console.error(err)
